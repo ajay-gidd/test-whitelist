@@ -27,12 +27,12 @@ data:
         regex: production
         source_labels: [__meta_kubernetes_service_label_rock_io_environment]
       {{- if eq $limit 80000 }}
-      - action: keep
-        regex: (auto-assign|auto-assign-canary|cdc-prod-pg-cdc-prod-pg|cdc-prod-pg-cdc-prod-pg-canary|collections-service|collections-service-canary|carousel-service-nav|carousel-service-nav-canary)
+  - action: keep
+    regex: (auto-assign|auto-assign-canary|cdc-prod-pg-cdc-prod-pg|cdc-prod-pg-cdc-prod-pg-canary|collections-service|collections-service-canary|carousel-service-nav|carousel-service-nav-canary|dash-business-metrics-service|dash-business-metrics-service-canary)
         source_labels: [__meta_kubernetes_service_label_app]
       {{- else if eq $limit 50000 }}
-      - action: keep
-        regex: (ie-pushgateway|cdc-snowflake-sync|ie-pushgateway-canary|cdc-snowflake-sync-canary|cerebro|cerebro-canary|dash-business-metrics-service|dash-business-metrics-service-canary|collections-service|collections-service-canary|metrics-pushgateway|vidura-runtime-ads|vidura-runtime-ads-canary|core-discounting-server|core-discounting-server-canary|de-allocator|de-allocator-canary|checkout-service|confluent-lag-exporter|cerebro-listing|ads-serving-layer-rest|ads-serving-layer|ingestion-pipeline|banner|confluent-lag-exporter-canary|cerebro-listing-canary|ads-serving-layer-rest-canary|ads-serving-layer-canary|ingestion-pipeline-canary|banner-canary|del-banner-go|del-banner-go-canary|cerebro|carousel-service|carousel-service-canary|gandalf|gandalf-canary)
+  - action: keep
+    regex: (ie-pushgateway|cdc-snowflake-sync|ie-pushgateway-canary|cdc-snowflake-sync-canary|cerebro|cerebro-canary||collections-service|collections-service-canary|metrics-pushgateway|vidura-runtime-ads|vidura-runtime-ads-canary|core-discounting-server|core-discounting-server-canary|de-allocator|de-allocator-canary|checkout-service|confluent-lag-exporter|cerebro-listing|ads-serving-layer-rest|ads-serving-layer|ingestion-pipeline|banner|confluent-lag-exporter-canary|cerebro-listing-canary|ads-serving-layer-rest-canary|ads-serving-layer-canary|ingestion-pipeline-canary|banner-canary|del-banner-go|del-banner-go-canary|cerebro|carousel-service|carousel-service-canary|gandalf|gandalf-canary)
         source_labels: [__meta_kubernetes_service_label_app]
       {{- else if eq $limit 20000 }}
       - action: keep
