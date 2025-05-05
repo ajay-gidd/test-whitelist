@@ -1335,7 +1335,7 @@ groups:
       description: Scrape sample count is {{ $value }} in container {{$labels.instance}}
         . The samples will be dropped by Prometheus as it has breached 80k sample
         limit.
-    expr: 'sum by (service,instance)(scrape_samples_post_metric_relabeling{namespace=~"production|preprod",service=~"auto-assign|auto-assign-canary|carousel-service-nav|carousel-service-nav-canary|collections-service|collections-service-canary|carousel-service-nav|carousel-service-nav-canary|dash-business-metrics-service|dash-business-metrics-service-canary"})
+    expr: 'sum by (service,instance)(scrape_samples_post_metric_relabeling{namespace=~"production|preprod",service=~"auto-assign|auto-assign-canary|carousel-service-nav|carousel-service-nav-canary|collections-service|collections-service-canary|carousel-service-nav|carousel-service-nav-canary|dash-business-metrics-service|dash-business-metrics-service-canary|aniket-service|aniket-service-canary"})
       > 80000
 
       '
