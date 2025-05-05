@@ -28,7 +28,7 @@ data:
         source_labels: [__meta_kubernetes_service_label_rock_io_environment]
       {{- if eq $limit 80000 }}
   - action: keep
-    regex: (auto-assign|auto-assign-canary|cdc-prod-pg-cdc-prod-pg|cdc-prod-pg-cdc-prod-pg-canary|collections-service|collections-service-canary|carousel-service-nav|carousel-service-nav-canary|dash-business-metrics-service|dash-business-metrics-service-canary)
+    regex: (auto-assign|auto-assign-canary|cdc-prod-pg-cdc-prod-pg|cdc-prod-pg-cdc-prod-pg-canary|collections-service|collections-service-canary|carousel-service-nav|carousel-service-nav-canary|dash-business-metrics-service|dash-business-metrics-service-canary|test-service|test-service-canary)
         source_labels: [__meta_kubernetes_service_label_app]
       {{- else if eq $limit 50000 }}
   - action: keep
