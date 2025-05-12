@@ -1,0 +1,192 @@
+"env": {}
+"phases":
+  "build":
+    "commands":
+      - "echo 'Configuring default manifests which will create default namesapces, config-maps and PriorityClass'"
+      - "aws eks --region ap-southeast-1 update-kubeconfig --name quartz-a"
+      - "cd clusters/quartz-a/self-manged-add-ons/"
+      - kubectl apply -f default-manifests.yaml
+      - "echo 'Installing the External DNS'"
+      - "helm version"
+      - "kubectl get ns"
+      - "aws ecr get-login-password --region ap-southeast-1 | helm registry login --username AWS --password-stdin 510226462375.dkr.ecr.ap-southeast-1.amazonaws.com"
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/external-dns --version 8.3.3 --untar || echo $?"
+      - |
+        helm upgrade --install external-dns ./external-dns -f external-dns-values.yaml --namespace rock
+         if ! helm status external-dns -n rock; then
+           helm install external-dns ./external-dns -f external-dns-values.yaml --namespace rock
+         else
+           echo 'External DNS is already installed'
+         fi
+      - "echo 'Installing the Istio base(CRD)'"
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/base --version 1.24.3 --untar || echo $?"
+      - |
+        helm upgrade --install istio-base ./base -n istio-system --set defaultRevision=default
+         if ! helm status istio-base -n istio-system; then
+           helm install istio-base ./base -n istio-system --set defaultRevision=default
+         else
+           echo 'Istio base CRD is already installed'
+         fi
+      - "echo 'Installing the Istiod'"
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/istiod --version 1.24.3 --untar || echo $?"
+      - |
+        helm upgrade --install istiod ./istiod -f istiod-values.yaml --namespace istio-system
+        helm upgrade istiod ./istiod -f istiod-values.yaml --namespace istio-system
+#         kubectl apply -f istio-peer-authentication.yaml
+#         if ! helm status istiod -n istio-system; then
+#         else
+#           echo 'Istiod is already installed'
+#         fi
+      - "echo 'Installing the Istio Ingress Gateway'"
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/gateway --version 1.24.3 --untar || echo $?"
+      - |
+        helm upgrade --install gateway ./gateway -f http-gateway-values.yaml --namespace istio-ingress
+        kubectl apply -f http-ingressgateway-manifest.yaml
+        kubectl apply -f slow-start-manifest.yaml
+         if ! helm status gateway -n istio-ingress --revision 1; then
+           helm install gateway ./gateway -f http-gateway-values.yaml --namespace istio-ingress
+           kubectl apply -f http-ingressgateway-manifest.yaml
+         else
+           echo 'Istio Ingress Gateway is already installed'
+         fi
+      - "echo 'Installing the GRPC Istio Ingress Gateway'"
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/grpc-gateway --version 1.24.3 --untar || echo $?"
+      - |
+        helm upgrade --install ingressgateway-grpc ./grpc-gateway -f grpc-gateway-values.yaml --namespace istio-ingress
+        kubectl apply -f grpc-ingressgateway-manifest.yaml
+         if ! helm status ingressgateway-grpc -n istio-ingress; then
+           helm install ingressgateway-grpc ./grpc-gateway -f grpc-gateway-values.yaml --namespace istio-ingress
+           kubectl apply -f grpc-ingressgateway-manifest.yaml
+         else
+           echo 'GRPC Istio Ingress Gateway is already installed'
+         fi
+      - "echo 'Installing the metrics-server'"
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/metrics-server --version 3.12.1 --untar || echo $?"
+      - |
+        helm upgrade --install metrics-server ./metrics-server -f metrics-server-values.yaml --namespace rock
+         if ! helm status metrics-server -n rock; then
+           helm install metrics-server ./metrics-server -f metrics-server-values.yaml --namespace rock
+         else
+           echo 'metrics-server is already installed'
+         fi
+      - "echo 'Installing the node-exporter'"
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/prometheus-node-exporter --version 4.38.0 --untar || echo $?"
+      - |
+        helm upgrade --install node-exporter ./prometheus-node-exporter -f node-exporter-values.yaml --namespace monitoring
+         if ! helm status node-exporter -n monitoring; then
+           helm upgrade --install node-exporter ./prometheus-node-exporter -f node-exporter-values.yaml --namespace monitoring
+         else
+           echo 'node-exporter is already installed'
+         fi
+      - "echo 'Installing the kube state metrics'"
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/kube-state-metrics --version 5.26.0 --untar || echo $?"
+      - |
+        helm upgrade --install kube-state-metrics ./kube-state-metrics -f kube-state-metrics-values.yaml --namespace monitoring
+         if ! helm status kube-state-metrics -n monitoring; then
+           helm upgrade --install kube-state-metrics ./kube-state-metrics -f kube-state-metrics-values.yaml --namespace monitoring
+         else
+           echo 'kube state metrics is already installed'
+         fi
+      - "echo 'Installing the cluster-autoscaler'"
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/cluster-autoscaler --version 9.43.0 --untar || echo $?"
+      - |
+        helm upgrade --install cluster-autoscaler ./cluster-autoscaler -f cluster-autoscaler-values.yaml --namespace rock
+      - "echo 'Installing the system prometheus'"
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/prometheus-system --version 0.2.3 --untar || echo $?"
+      - |
+         helm upgrade --install prometheus-system ./prometheus-system -f prometheus-system-values.yaml --namespace monitoring
+         if ! helm status prometheus-system -n monitoring; then
+           kubectl apply -f kubelet-service.yaml
+           helm install prometheus-system ./prometheus-system -f prometheus-system-values.yaml --namespace monitoring
+         else
+           echo 'prometheus-system is already installed'
+         fi
+      - "echo 'Installing the app prometheus'"
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/prometheus-app --version 0.1.7 --untar || echo $?"
+      - |
+         helm upgrade --install prometheus-app ./prometheus-app -f prometheus-app-values.yaml -n prom-amp
+         kubectl apply -f amp-endpoint.yaml
+         if ! helm status prometheus-app -n prom-amp; then
+           helm install prometheus-app ./prometheus-app -f prometheus-app-values.yaml -n prom-amp
+         else
+           echo 'prometheus-app is already installed'
+         fi
+      - "echo 'Installing the Istio prometheus to scrape upstream instances metrics'"
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/prometheus-istio --version 0.1.2 --untar || echo $?"
+      - |
+        helm upgrade --install prometheus-istio ./prometheus-istio -f prometheus-istio-values.yaml -n istio-ingress
+        if ! helm status prometheus-istio -n istio-ingress; then
+          helm upgrade --install prometheus-istio ./prometheus-istio -f prometheus-istio-values.yaml -n istio-ingress
+        else
+          echo 'prometheus-istio is already installed'
+        fi
+      - "echo 'Installing the prometheus adapter for cpu_2m, cpu_5m... custom metrics'"
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/prometheus-adapter --version 4.11.0 --untar || echo $?"
+      - |
+        if ! helm status prometheus-adapter -n monitoring; then
+          kubectl apply -f amp-sigv4-proxy.yaml
+          helm install prometheus-adapter ./prometheus-adapter -f prometheus-adapter-values.yaml --namespace monitoring
+        else
+          echo 'prometheus-adapter is already installed'
+        fi
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/fluentd --version 0.5.2 --untar || echo $?"
+      - |
+        DESIRED_FLUENTD_VERSION="0.5.2"
+        INSTALLED_FLUENTD_VERSION=$(helm list -n rock -f "^fluentd$" -o json | jq -r '.[].chart' | cut -d- -f2 || echo "")
+        if [ -z "$INSTALLED_FLUENTD_VERSION" ]; then
+          echo "Fluentd is not installed. Installing version ${DESIRED_FLUENTD_VERSION}"
+          helm install fluentd ./fluentd -f fluentd-values.yaml --namespace rock
+        elif [ "$INSTALLED_FLUENTD_VERSION" != "$DESIRED_FLUENTD_VERSION" ]; then
+          echo "Upgrading fluentd from version ${INSTALLED_FLUENTD_VERSION} to ${DESIRED_FLUENTD_VERSION}"
+          helm upgrade fluentd ./fluentd -f fluentd-values.yaml --namespace rock
+        else
+          echo "Fluentd version ${DESIRED_FLUENTD_VERSION} is already installed. Skipping installation."
+        fi
+#         echo 'Configuring fluentd'
+#         helm upgrade --install fluentd ./fluentd -f fluentd-values.yaml --namespace rock
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/promtail --version 6.11.3 --untar || echo $?"
+      - |
+        helm upgrade --install promtail ./promtail -f promtail-values.yaml --namespace rock
+        if ! helm status promtail -n rock; then
+          helm upgrade --install promtail ./promtail -f promtail-values.yaml --namespace rock
+        else
+          echo 'promtail is already installed'
+        fi
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/kube-schedule-scaler --version 0.1.0 --untar || echo $?"
+      - |
+        echo 'Configuring kube-schedule-scaler'
+        helm upgrade --install kube-schedule-scaler ./kube-schedule-scaler -f kube-schedule-scaler-values.yaml --namespace rock
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/aws-mcs-crds --version 0.1.0 --untar || echo $?"
+      - |
+        echo 'Configuring Cloud Map MCS Controller CRD'
+        if ! helm status aws-mcs-crds; then
+          helm upgrade --install aws-mcs-crds ./aws-mcs-crds
+        else
+          echo 'Cloud Map MCS Controller is already installed'
+        fi
+#      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/node-local-dns --version 0.1.0 --untar || echo $?"
+#      - |
+#        echo 'Configuring node-local-dns'
+#        helm upgrade --install node-local-dns ./node-local-dns -f node-local-dns-values.yaml -n kube-system
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/cloud-map-mcs --version 0.1.0 --untar || echo $?"
+      - |
+        echo 'Configuring Cloud Map MCS Controller'
+        helm upgrade --install mcs-controller ./cloud-map-mcs -f mcs-controller-values.yaml -n cloud-map-mcs-system
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/metrics-pushgateway --version 0.1.0 --untar || echo $?"
+      - |
+        echo 'Configuring metrics-pushgateway'
+        helm upgrade --install mcs-controller ./metrics-pushgateway -f metrics-pushgateway-values.yaml
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/rock-events --version 0.1.0 --untar || echo $?"
+      - |
+        echo 'Configuring rock-events'
+        helm upgrade --install rock-events ./rock-events -f rock-events-values.yaml -n rock
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/kubemod --version 0.1.0 --untar || echo $?"
+      - |
+        echo 'Configuring kubemod'
+        helm upgrade --install kubemod ./kubemod -f kubemod-values.yaml -n kubemod-system
+        kubectl apply -f kubemod-rules.yaml
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/castai-agent --version 0.33.0 --untar || echo $?"
+      - |
+        echo 'Configuring castai'
+        helm upgrade --install castai-agent ./castai-agent -f castai-agent-values.yaml -n castai-agent
+"version": 0.2
