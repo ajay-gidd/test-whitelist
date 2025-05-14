@@ -26,21 +26,79 @@ data:
       - action: keep
         regex: production
         source_labels: [__meta_kubernetes_service_label_rock_io_environment]
-      {{- else if eq $limit 80000 }}
-  - action: keep
-    regex: (auto-assign|auto-assign-canary|cdc-prod-pg-cdc-prod-pg|cdc-prod-pg-cdc-prod-pg-canary|collections-service|collections-service-canary|carousel-service-nav|carousel-service-nav-canary|test01-service|test01-service-canary)
+      {{- if eq $limit 80000 }}
+      - action: keep
+        regex: (auto-assign|auto-assign-canary|cdc-prod-pg-cdc-prod-pg|cdc-prod-pg-cdc-prod-pg-canary|carousel-service-nav|carousel-service-nav-canary)
         source_labels: [__meta_kubernetes_service_label_app]
       {{- else if eq $limit 50000 }}
-  - action: keep
-    regex: (ie-pushgateway|cdc-snowflake-sync|ie-pushgateway-canary|cdc-snowflake-sync-canary|cerebro|cerebro-canary|dash-business-metrics-service|dash-business-metrics-service-canary|collections-service|collections-service-canary|metrics-pushgateway|vidura-runtime-ads|vidura-runtime-ads-canary|core-discounting-server|core-discounting-server-canary|de-allocator|de-allocator-canary|checkout-service|confluent-lag-exporter|cerebro-listing|ads-serving-layer-rest|ads-serving-layer|ingestion-pipeline|banner|confluent-lag-exporter-canary|cerebro-listing-canary|ads-serving-layer-rest-canary|ads-serving-layer-canary|ingestion-pipeline-canary|banner-canary|del-banner-go|del-banner-go-canary|cerebro|carousel-service|carousel-service-canary|gandalf|gandalf-canary|swati-service|swati-service-canary)
+      - action: keep
+        regex: (ie-pushgateway|cdc-snowflake-sync|ie-pushgateway-canary|cdc-snowflake-sync-canary|cerebro|cerebro-canary|dash-business-metrics-service|dash-business-metrics-service-canary|metrics-pushgateway|vidura-runtime-ads|vidura-runtime-ads-canary|core-discounting-server|core-discounting-server-canary|de-allocator|de-allocator-canary|checkout-service|confluent-lag-exporter|cerebro-listing|ads-serving-layer-rest|ads-serving-layer|ingestion-pipeline|banner|confluent-lag-exporter-canary|cerebro-listing-canary|ads-serving-layer-rest-canary|ads-serving-layer-canary|ingestion-pipeline-canary|banner-canary|del-banner-go|del-banner-go-canary|cerebro|gandalf|gandalf-canary)
         source_labels: [__meta_kubernetes_service_label_app]
       {{- else if eq $limit 20000 }}
       - action: keep
-        regex: (ff-reminder-notifier|ff-reminder-notifier-canary|vidura-runtime-listing-new|vidura-runtime-listing-new-canary|hulk-consumer|sentinel|dash-data-service|dash-cart|hulk-consumer-canary|sentinel-canary|dash-data-service-canary|dash-cart-canary|cerebro-listing|cerebro-listing-canary|surff|surff-canary|ads-serving-layer|ads-serving-layer-canary|ads-serving-layer-rest|ads-serving-layer-rest-canary|widget-manager|widget-manager-canary|one-compass-service|one-compass-service-canary|food-pre-delivery-bot|food-pre-delivery-bot-canary|dash-serviceability|dash-serviceability-canary|offer-server|offer-server-canary|im-checkout-service|im-checkout-service-canary|vidura-runtime-dash|vidura-runtime-dash-canary|del-banner-go|del-banner-go-canary|svcplatform-prediction|svcplatform-prediction-canary|unboxing-service|unboxing-service-canary|svc-prediction|svc-prediction-canary|preorder-cod-eval|preorder-cod-eval-canary|vidura-runtime-menu|vidura-runtime-menu-canary|de-lifecycle-management|de-lifecycle-management-canary|seo-data|seo-data-canary|picker-assignment|picker-assignment-canary|postorder-abuse-eval|postorder-abuse-eval-canary|svcplatform-aggregator|svcplatform-aggregator-canary|vidura-runtime-perf|vidura-runtime-perf-canary|order-platform|order-platform-canary|carousel-service|carousel-service-canary)
+        regex: (ff-reminder-notifier|ff-reminder-notifier-canary|vidura-runtime-listing-new|vidura-runtime-listing-new-canary|hulk-consumer|sentinel|dash-data-service|dash-cart|hulk-consumer-canary|sentinel-canary|dash-data-service-canary|dash-cart-canary|cerebro-listing|cerebro-listing-canary|surff|surff-canary|ads-serving-layer|ads-serving-layer-canary|ads-serving-layer-rest|ads-serving-layer-rest-canary|widget-manager|widget-manager-canary|one-compass-service|one-compass-service-canary|food-pre-delivery-bot|food-pre-delivery-bot-canary|dash-serviceability|dash-serviceability-canary|offer-server|offer-server-canary|im-checkout-service|im-checkout-service-canary|vidura-runtime-dash|vidura-runtime-dash-canary|del-banner-go|del-banner-go-canary|svcplatform-prediction|svcplatform-prediction-canary|unboxing-service|unboxing-service-canary|svc-prediction|svc-prediction-canary|preorder-cod-eval|preorder-cod-eval-canary|vidura-runtime-menu|vidura-runtime-menu-canary|de-lifecycle-management|de-lifecycle-management-canary|seo-data|seo-data-canary|picker-assignment|picker-assignment-canary|postorder-abuse-eval|postorder-abuse-eval-canary|svcplatform-aggregator|svcplatform-aggregator-canary|vidura-runtime-perf|vidura-runtime-perf-canary|order-platform|order-platform-canary|ads-serving|ads-serving-canary)
         source_labels: [__meta_kubernetes_service_label_app]
       {{- else }}
       - action: drop
-        regex: (swati-service|swati-service-canary|ff-reminder-notifier|ff-reminder-notifier-canary|vidura-runtime-listing-new|vidura-runtime-listing-new-canary|auto-assign|hulk-consumer|ie-pushgateway|cdc-prod-pg-cdc-prod-pg|sentinel|cdc-snowflake-sync|dash-business-metrics-service|dash-data-service|dash-cart|auto-assign-canary|ie-pushgateway-canary|cdc-prod-pg-cdc-prod-pg-canary|cdc-snowflake-sync-canary|hulk-consumer-canary|sentinel-canary|dash-business-metrics-service-canary|dash-data-service-canary|dash-cart-canary|smart-pricing|cerebro|cerebro-listing|cerebro-canary|cerebro-listing-canary|surff|surff-canary|ads-serving-layer|ads-serving-layer-canary|ads-serving-layer-rest|ads-serving-layer-rest-canary|widget-manager|widget-manager-canary|vidura-runtime-ads|vidura-runtime-ads-canary|one-compass-service|one-compass-service-canary|food-pre-delivery-bot|food-pre-delivery-bot-canary|dash-serviceability|dash-serviceability-canary|offer-server|offer-server-canary|im-checkout-service|im-checkout-service-canary|vidura-runtime-dash|vidura-runtime-dash-canary|del-banner-go|del-banner-go-canary|svcplatform-prediction|svcplatform-prediction-canary|unboxing-service|unboxing-service-canary|svc-prediction|svc-prediction-canary|preorder-cod-eval|preorder-cod-eval-canary|metrics-pushgateway|vidura-runtime-menu|vidura-runtime-menu-canary|de-lifecycle-management|de-lifecycle-management-canary|seo-data|seo-data-canary|picker-assignment|picker-assignment-canary|postorder-abuse-eval|postorder-abuse-eval-canary|vidura-runtime-perf|vidura-runtime-perf-canary|order-platform|order-platform-canary|core-discounting-server|core-discounting-server-canary|carousel-service-nav|carousel-service-nav-canary|carousel-service|carousel-service-canary|svcplatform-aggregator|svcplatform-aggregator-canary|de-allocator|de-allocator-canary|checkout-service|confluent-lag-exporter|cerebro-listing|ads-serving-layer-rest|ads-serving-layer|ingestion-pipeline|banner|confluent-lag-exporter-canary|cerebro-listing-canary|ads-serving-layer-rest-canary|ads-serving-layer-canary|ingestion-pipeline-canary|banner-canary|del-banner-go|del-banner-go-canary|cerebro|carousel-service|carousel-service-canary|gandalf|gandalf-canary|collections-service|collections-service-canary|carousel-service-nav|carousel-service-nav-canary|test01-service|test01-service-canary)
+        regex: (ff-reminder-notifier|ff-reminder-notifier-canary|vidura-runtime-listing-new|vidura-runtime-listing-new-canary|auto-assign|hulk-consumer|ie-pushgateway|cdc-prod-pg-cdc-prod-pg|sentinel|cdc-snowflake-sync|dash-business-metrics-service|dash-data-service|dash-cart|auto-assign-canary|ie-pushgateway-canary|cdc-prod-pg-cdc-prod-pg-canary|cdc-snowflake-sync-canary|hulk-consumer-canary|sentinel-canary|dash-business-metrics-service-canary|dash-data-service-canary|dash-cart-canary|smart-pricing|cerebro|cerebro-listing|cerebro-canary|cerebro-listing-canary|surff|surff-canary|ads-serving-layer|ads-serving-layer-canary|ads-serving-layer-rest|ads-serving-layer-rest-canary|widget-manager|widget-manager-canary|vidura-runtime-ads|vidura-runtime-ads-canary|one-compass-service|one-compass-service-canary|food-pre-delivery-bot|food-pre-delivery-bot-canary|dash-serviceability|dash-serviceability-canary|offer-server|offer-server-canary|im-checkout-service|im-checkout-service-canary|vidura-runtime-dash|vidura-runtime-dash-canary|del-banner-go|del-banner-go-canary|svcplatform-prediction|svcplatform-prediction-canary|unboxing-service|unboxing-service-canary|svc-prediction|svc-prediction-canary|preorder-cod-eval|preorder-cod-eval-canary|metrics-pushgateway|vidura-runtime-menu|vidura-runtime-menu-canary|de-lifecycle-management|de-lifecycle-management-canary|seo-data|seo-data-canary|picker-assignment|picker-assignment-canary|postorder-abuse-eval|postorder-abuse-eval-canary|vidura-runtime-perf|vidura-runtime-perf-canary|order-platform|order-platform-canary|core-discounting-server|core-discounting-server-canary|carousel-service-nav|carousel-service-nav-canary|svcplatform-aggregator|svcplatform-aggregator-canary|de-allocator|de-allocator-canary|checkout-service|confluent-lag-exporter|cerebro-listing|ads-serving-layer-rest|ads-serving-layer|ingestion-pipeline|banner|confluent-lag-exporter-canary|cerebro-listing-canary|ads-serving-layer-rest-canary|ads-serving-layer-canary|ingestion-pipeline-canary|banner-canary|del-banner-go|del-banner-go-canary|cerebro|carousel-service|carousel-service-canary|gandalf|gandalf-canary|collections-service|collections-service-canary|carousel-service-nav|carousel-service-nav-canary|ads-serving|ads-serving-canary)
+        source_labels: [__meta_kubernetes_service_label_app]
+      {{- end }}
+      - action: replace
+        source_labels:
+        - __meta_kubernetes_service_label_app
+        target_label: service
+      - action: replace
+        source_labels:
+        - __meta_kubernetes_service_label_app
+        target_label: job
+      - action: replace
+        source_labels:
+        - __meta_kubernetes_endpoint_node_name
+        target_label: kube_node_prom
+      - action: replace
+        source_labels:
+        - __meta_kubernetes_namespace
+        target_label: namespace
+      - action: replace
+        source_labels:
+        - __meta_kubernetes_namespace
+        target_label: env
+      - target_label: endpoint
+        replacement: "http"
+      - action: drop
+        regex: "cost-analyzer"
+        source_labels: [__meta_kubernetes_service_label_app]
+      - action: drop
+        regex: "rds-monitoring"
+        source_labels: [__meta_kubernetes_service_label_app]
+      metric_relabel_configs:
+      - source_labels: [__name__]
+        separator: ;
+        regex: (catalog_cart_worker_ExecuteWorker_disabled_items|lib_upstream_errors|NIMC_INSTAMART_ORDER_STATUS_SLA.*|NIMC_INSTAMART_ORDER_SLA|NIMC_INSTAMART_STATE_TRANSITION_COUNTER|WIDGET_LATENCY.*|external_requests_seconds_max|external_requests_seconds_sum|external_requests_seconds_count|de_lifecycle_management_external_api_retry_counter|org_apache_commons_pool2_GenericObjectPool.*|geofence_trip_handler_latency_bucket|kafka_producer_counter|geofence_trip_handler_latency_sum|geofence_trip_handler_latency_count|zone_ttf_cron_seconds_bucket|swiggy_rate_card_service_business_counter_total|enrichment_generic_histogram_bucket|stress_distribution_job_latencies|fetch_entity_signals_snowflake_histogram_counter_bucket|trms_heartbeat_response_time_bucket|ruby_handle_cnr_chats_time_bucket|ruby_assignments_per_bucket_bucket|ruby_teams_queue_subscriptions_bucket|ruby_queues_online_agents_bucket|ruby_queues_customers_waiting_bucket|ruby_queues_available_chat_rooms_bucket|cart_add_get_api_error|alchemist2_janus_shift_counter_success_count|prediction_batch_size_histogram_bucket|dsp_per_key_fetch_time|dsp_per_key_fetch_time|dp_cdc_delta_table_hive_metastore_sync_success)
+        replacement: $1
+        action: drop
+    {{- end }}
+
+    {{- range $i, $limit := (list 80000 50000 ) }}
+    - job_name: kubernetes-pods-exception-1m-{{ $limit }}
+      sample_limit: {{ $limit }}
+      scrape_interval: 1m
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - action: keep
+        regex: K8S_NODE_NAME
+        source_labels: [__meta_kubernetes_endpoint_node_name]
+      - action: keep
+        regex: production
+        source_labels: [__meta_kubernetes_service_label_rock_io_environment]
+      {{- if eq $limit 80000 }}
+      - action: keep
+        regex: (collections-service|collections-service-canary)
+        source_labels: [__meta_kubernetes_service_label_app]
+      {{- else if eq $limit 50000 }}
+      - action: keep
+        regex: (carousel-service|carousel-service-canary)
         source_labels: [__meta_kubernetes_service_label_app]
       {{- end }}
       - action: replace
