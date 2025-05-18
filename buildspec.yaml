@@ -102,7 +102,7 @@
            echo 'prometheus-system is already installed'
          fi
       - "echo 'Installing the app prometheus'"
-      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/prometheus-app --version 0.1.12 --untar || echo $?"
+      - "helm pull oci://510226462375.dkr.ecr.ap-southeast-1.amazonaws.com/helm-charts/prometheus-app --version 0.1.13 --untar || echo $?"
       - |
          helm upgrade --install prometheus-app ./prometheus-app -f prometheus-app-values.yaml -n prom-amp
          kubectl apply -f amp-endpoint.yaml
